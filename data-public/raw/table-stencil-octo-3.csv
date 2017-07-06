@@ -1,0 +1,20 @@
+paramHeader,param,effect,label
+Intercepts,IA,Fixed effect,(F)-Intercept
+IA.ON,AGE_C80,Fixed effect,Baseline age
+IA.ON,EDU_C7,Fixed effect,Education
+IA.ON,FEMALE,Fixed effect,Gender
+IA.ON,SBP_C167,Fixed effect,Systolic BP
+Intercepts,SA,Fixed effect,(F)-Linear slope
+SA.ON,AGE_C80,Fixed effect,L-slope*Baseline age
+SA.ON,EDU_C7,Fixed effect,L-slope*Education
+SA.ON,FEMALE,Fixed effect,L-slope*Gender
+SA.ON,SBP_C167,Fixed effect,L-slope*Systolic BP
+Intercepts,QA,Fixed effect,(F)-Quadratic slope
+QA.ON,AGE_C80,Fixed effect,Q-slope*Baseline age
+QA.ON,EDU_C7,Fixed effect,Q-slope*Education
+QA.ON,FEMALE,Fixed effect,Q-slope*Gender
+QA.ON,SBP_C167,Fixed effect,Q-slope*Systolic BP
+Residual.Variances,IA,Random effect,(R)-Intercept
+Residual.Variances,SA,Random effect,(R)-Linear slope
+Residual.Variances,QA,Random effect,(R)-Quadratic slope
+Residual.Variances,A_01,Random effect,(R)-Error
