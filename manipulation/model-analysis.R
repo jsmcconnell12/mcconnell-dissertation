@@ -57,6 +57,11 @@ ds %>%
   geom_point()+
   theme_bw()
 
+# histogram of the residuals
+ds %>% TabularManifest::histogram_continuous(
+  variable_name = "residual" )
+
+
 
 # ---- basic-graph --------------------------
 
