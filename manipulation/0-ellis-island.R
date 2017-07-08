@@ -24,6 +24,7 @@ path_stencil      <- "./data-public/raw/table-stencil.csv"
 path_outputs <- list.files(path_folder,pattern = ".out$",full.names = T, recursive = T)
 stencil <- readr::read_csv(path_stencil) # shorter names
 
+
 ## ---- define-utility-functions ---------------
 # formatting functions to remove leading zero
 numformat <- function(val) { sub("^(-?)0.", "\\1.", sprintf("%.2f", val)) }
@@ -124,3 +125,25 @@ model_result <- MplusAutomation::readModels(path_outputs[1])
 saveRDS(model_result, "./data-unshared/derived/model_result.rds")
 
 
+
+# ---- examine-created-output ----------------
+source("./scripts/mplus/mplus.R") # downloaded from http://www.statmodel.com/mplus-R/mplus.R
+path_gh5 <- "./sandbox/syntax-creator/outputs/grip-mmse/male_5.gh5"
+
+# view options: https://www.statmodel.com/mplus-R/GH5_R.shtml
+
+mplus.list.variables(path_gh5) # variables in the gh5 file
+mplus.view.plots(path_gh5)  # available graphs for this type of gh5 file
+# histograms
+mplus.plot.histogram(path_gh5, "SA") # slope of process A
+mplus.plot.histogram(path_gh5, "SB") # slope of process B
+# scatterplots
+mplus.plot.scatterplot(path_gh5, "IA", "IB") # intercepts
+mplus.plot.scatterplot(path_gh5, "SA", "SB") # slopes
+mplus.plot.scatterplot(path_gh5, "IA", "SA") # physical
+mplus.plot.scatterplot(path_gh5, "IB", "SB") # cognitive
+
+ds <- mplus.get.data(path_gh5, "SA")
+
+summary(ds)
+head(ds)
