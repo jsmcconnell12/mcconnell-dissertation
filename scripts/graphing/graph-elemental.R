@@ -40,7 +40,7 @@ elemental_line <- function(
   g <- g + 
     # scale_x_continuous(labels=scales::comma_format()) +
     scale_y_continuous(labels=scales::comma_format()) +
-    labs(title=main_title, x=x_title, y=y_title) +
+    # labs(title=main_title, x=x_title, y=y_title) +
     theme_light() +
     theme(axis.ticks.length = grid::unit(0, "cm"))
   return( g )
