@@ -49,6 +49,13 @@ ds %>% elemental_line(
   rounded_digits = 0L
 )
 
+# Plot residuals against observed or modeled 
+ds %>% 
+  # ggplot2::ggplot(aes(x=FAT, y=residual))+
+  ggplot2::ggplot(aes(x=predicted, y=residual))+
+  geom_abline(slope = 0, intercept = 0)+
+  geom_point()+
+  theme_bw()
 
 
 # ---- basic-graph --------------------------
