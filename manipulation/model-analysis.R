@@ -54,13 +54,12 @@ ds %>%
   # ggplot2::ggplot(aes(x=FAT, y=residual))+
   ggplot2::ggplot(aes(x=predicted, y=residual))+
   geom_abline(slope = 0, intercept = 0)+
-  geom_point()+
+  geom_point(aes(fill=as.factor(SEX)), shape=21)+
   theme_bw()
 
 # histogram of the residuals
 ds %>% TabularManifest::histogram_continuous(
-  variable_name = "residual" )
-
+  variable_name = "residual")
 
 
 # ---- basic-graph --------------------------
