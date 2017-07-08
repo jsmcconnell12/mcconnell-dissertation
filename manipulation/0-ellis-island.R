@@ -24,16 +24,6 @@ path_stencil      <- "./data-public/raw/table-stencil.csv"
 path_outputs <- list.files(path_folder,pattern = ".out$",full.names = T, recursive = T)
 stencil <- readr::read_csv(path_stencil) # shorter names
 
-path <- path_outputs[1]
-
-mp <- MplusAutomation::extractModelParameters(path)
-ms <- MplusAutomation::extractModelSummaries(path)
-sd <- MplusAutomation::getSavedata_Data(path)
-
-# The wrapper function fails due to unknown reason, might be file
-# model_result <- MplusAutomation::readModels(path)
-# This is the next bottleneck: figure out why readModels() fails
-
 ## ---- define-utility-functions ---------------
 # formatting functions to remove leading zero
 numformat <- function(val) { sub("^(-?)0.", "\\1.", sprintf("%.2f", val)) }
@@ -45,8 +35,9 @@ get_estimate_table <- function(
 ){
   # lst <- model_result
   d1 <- lst[["parameters"]][["unstandardized"]]
-  d2 <- stencil %>% 
-    dplyr::left_join(d1,by=c("paramHeader","param")) %>% 
+  # d2 <- stencil %>% 
+  d2 <- d1 %>% 
+    # dplyr::left_join(d1,by=c("paramHeader","param")) %>% 
     dplyr::mutate(
       est_pretty  = numformat( est),
       se_pretty   = numformat( se),
@@ -66,32 +57,32 @@ parse_outputs <- function(
   # stencil <- stencil
   
   ls_catalog <- list()
-  regex_1 <- "(u0|u1|u2|b0|b1|b2)_(\\w+)_(\\w+)_(\\w+)_(\\w+)"
+  # regex_1 <- "(u0|u1|u2|b0|b1|b2)_(\\w+)_(\\w+)_(\\w+)_(\\w+)"
   for(i in seq_along(paths)){
     # i <- 1
     model_name <- gsub(".out$","",basename(paths[i]))
     model_result <- MplusAutomation::readModels(paths[i])
     if(length(model_result$errors)==0L){
       ls_temp <- list(
-        "model_number" =  gsub(regex_1, "\\1", model_name),
-        "subgroup"     =  gsub(regex_1, "\\2", model_name),
-        "model_type"   =  gsub(regex_1, "\\3", model_name),
-        "process_a"    =  gsub(regex_1, "\\4", model_name),
-        "process_b"    =  gsub(regex_1, "\\5", model_name),
+        # "model_number" =  gsub(regex_1, "\\1", model_name),
+        # "subgroup"     =  gsub(regex_1, "\\2", model_name),
+        # "model_type"   =  gsub(regex_1, "\\3", model_name),
+        # "process_a"    =  gsub(regex_1, "\\4", model_name),
+        # "process_b"    =  gsub(regex_1, "\\5", model_name),
         "table"        =  get_estimate_table(model_result, stencil),
         "N"            = model_result$summaries$Observations,
         "parameters"   = model_result$summaries$Parameters,
         "AIC"          = model_result$summaries$AIC,
         "BIC"          = model_result$summaries$BIC,
-        "path"         =  path[i]
+        "path"         = paths[i]
       )
     } else{
       ls_temp <- list(
-        "model_number" =  gsub(regex_1, "\\1", model_name),
-        "subgroup"     =  gsub(regex_1, "\\2", model_name),
-        "model_type"   =  gsub(regex_1, "\\3", model_name),
-        "process_a"    =  gsub(regex_1, "\\4", model_name),
-        "process_b"    =  gsub(regex_1, "\\5", model_name),
+        # "model_number" =  gsub(regex_1, "\\1", model_name),
+        # "subgroup"     =  gsub(regex_1, "\\2", model_name),
+        # "model_type"   =  gsub(regex_1, "\\3", model_name),
+        # "process_a"    =  gsub(regex_1, "\\4", model_name),
+        # "process_b"    =  gsub(regex_1, "\\5", model_name),
         "table"        = NA,
         "N"            = NA,
         "parameters"   = NA,
@@ -108,17 +99,16 @@ parse_outputs <- function(
 # ---- assemble-catalog -------------------------------
 # assemble the list catalog by running parsing functions
 ls_catalog <- parse_outputs(path_outputs, stencil_octo)
-
 # after parsing all outputs, you might want to save the catalog for faster access later
-# saveRDS(ls_catalog,"./data/shared/derived/ls_catalog.rds")
-# ls_catalog <- readRDS("./data/shared/derived/ls_catalog.rds")
+saveRDS(ls_catalog,"./data-public/derived/ls_catalog.rds")
+# ls_catalog <- readRDS("./data-public/derived/ls_catalog.rds")
 
 # Explore catalog
 names(ls_catalog)
 # View the names of the components in the first element of the list
 names(ls_catalog[[1]])
 # print the contents of the first element
-ls_catalog[["b1_female_a_pef_block"]]
+ls_catalog[["model-final-2017-07-05"]]
 
 # ---- flatten-catalog -------------------------
 # convert list object into a single flat dataframe
@@ -127,18 +117,10 @@ names(ds_catalog) <- gsub("^table.","",names(ds_catalog))
 
 # ---- save-to-disk ----------------------------
 # save for faster recall later
-saveRDS(ds_catalog,"./data/shared/derived/catalog.rds")
-ds_catalog <- readRDS("./data/shared/derived/catalog.rds")
+saveRDS(ds_catalog,"./data-public/derived/ds_catalog.rds")
+# ds_catalog <- readRDS("./data-public/derived/catalog.rds")
+
+model_result <- MplusAutomation::readModels(path_outputs[1])
+saveRDS(model_result, "./data-unshared/derived/model_result.rds")
 
 
-# --- view-dynamic-tabel --------
-ds_catalog %>% 
-  dplyr::select(
-    subgroup, model_type, process_a, process_b, paramHeader
-  ) %>% 
-  DT::datatable(
-    class     = 'cell-border stripe',
-    caption   = "Solution of Bivariate Growth Curve models",
-    filter    = "top",
-    options   = list(pageLength = 6, autoWidth = TRUE)
-  )
